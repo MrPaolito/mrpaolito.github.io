@@ -1,16 +1,65 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Benvenuto!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esaurometro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    body {font-family:sans-serif;text-align:center;margin-top:10vh;}
-    h1  {font-size:3rem;color:#2b5;}
-    p   {font-size:1.2rem;color:#555;}
+    :root { --risk: 50; --needle-angle: calc(-110deg + (var(--risk) * 2.2deg)); }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Poppins",sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:2rem 1rem 4rem;background:linear-gradient(135deg,#141e30,#243b55);color:#fff}
+    h1{font-size:2rem;margin-bottom:2rem;text-align:center;letter-spacing:.5px}
+    .gauge{position:relative;width:min(90vw,400px);aspect-ratio:1/0.5;margin-bottom:2rem}
+    .gauge svg{width:100%;height:100%}
+    .needle{position:absolute;left:50%;bottom:0;width:4px;height:45%;background:#fff;transform-origin:bottom;transform:rotate(var(--needle-angle));transition:transform 1.2s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 8px rgba(255,255,255,.8)}
+    .value-label{font-size:clamp(1.5rem,5vw,2.5rem);font-weight:600;margin-top:1rem;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+    .btn-emergency{margin-top:2.5rem;padding:1rem 2.5rem;background:#d90429;border:2px solid #fff;border-radius:50px;color:#fff;font-size:1.1rem;font-weight:700;text-transform:uppercase;cursor:pointer;position:relative;animation:pulse 1.6s infinite;transition:transform .15s}
+    .btn-emergency:active{transform:scale(.96)}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,4,41,.7)}70%{box-shadow:0 0 0 18px rgba(217,4,41,0)}100%{box-shadow:0 0 0 0 rgba(217,4,41,0)}}
+    .quote{max-width:700px;margin-top:2rem;font-size:1.25rem;text-align:center;line-height:1.45;padding:0 1rem;opacity:0;transition:opacity .4s}
+    .quote.show{opacity:1}
+    .date-box{text-align:center;margin-top:1.5rem;font-size:1.15rem;line-height:1.4}
+    @media(prefers-color-scheme:light){body{background:linear-gradient(135deg,#fdfbfe,#e9e9e9);color:#222}.needle{background:#222}.btn-emergency{border-color:#222}}
   </style>
 </head>
 <body>
-  <h1>Ciao, GitHub Pages! 🚀</h1>
-  <p>Questa è la mia primissima pagina statica.</p>
+  <h1>Esaurometro 2025</h1>
+  <!-- Tachimetro -->
+  <div class="gauge" id="gauge">
+    <svg viewBox="0 0 100 50">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#2ecc71"/>
+          <stop offset="50%" stop-color="#f1c40f"/>
+          <stop offset="100%" stop-color="#e74c3c"/>
+        </linearGradient>
+      </defs>
+      <path d="M10 50 A40 40 0 0 1 90 50" stroke="url(#grad)" stroke-width="10" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="needle" id="needle"></div>
+  </div>
+  <div class="value-label" id="label">50%</div>
+  <!-- Data & countdown -->
+  <div class="date-box" id="dateBox"><span id="dateText"></span><br><span id="countdown"></span></div>
+  <!-- Emergency Quote Button -->
+  <button class="btn-emergency" id="quoteBtn">Calma istantanea</button>
+  <div class="quote" id="quote"></div>
+  <script>
+    /* ---- QUOTES ---- */
+    let quotesDataset=[];
+    async function loadQuotes(){try{const r=await fetch('./quotes.json');if(r.ok)quotesDataset=await r.json();}catch(e){console.warn('quotes.json non trovato')}}
+    function showRandomQuote(){const box=document.getElementById('quote');if(!quotesDataset.length){box.textContent='⚠️ Nessuna frase disponibile.';box.classList.add('show');return;}const q=quotesDataset[Math.floor(Math.random()*quotesDataset.length)];const t=typeof q==='string'?q:(q.text||JSON.stringify(q));box.textContent='“'+t+'”';box.classList.add('show');}
+    /* ---- DATE & COUNTDOWN ---- */
+    function updateDateInfo(){const now=new Date();const opts={weekday:'long',day:'numeric',month:'long',year:'numeric'};const dateEl=document.getElementById('dateText');dateEl.textContent=now.toLocaleDateString('it-IT',opts);const target=new Date(now.getFullYear(),9,1);if(now>target)target.setFullYear(now.getFullYear()+1);const diff=Math.ceil((target-now)/86400000);document.getElementById('countdown').textContent=diff+(diff===1?' giorno rimanente':' giorni rimanenti');setDateColor(now,dateEl);}
+    function setDateColor(now,el){const weekend=now.getDay()===0||now.getDay()===6;const boostDays=[8,9,10,12,14,15,16];const boost=(now.getMonth()===7)&&boostDays.includes(now.getDate());if(weekend||boost){el.style.color='#8B4513';/* marrone */}else if(now.getDay()===1||now.getDay()===2){el.style.color='#e63946';/* rosso */}else{el.style.color='';}}
+    /* ---- RISK GAUGE ---- */
+    function computeRiskForToday(){const today=new Date();const utc=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate()));let r=30+Math.random()*50;if(utc.getUTCDay()===0||utc.getUTCDay()===6)r+=5;const special=[8,9,10,12,14,15,16];if(utc.getUTCMonth()===7&&special.includes(utc.getUTCDate()))r+=15;return Math.round(Math.min(100,r));}
+    function setRisk(v){v=Math.max(0,Math.min(100,Number(v)||0));document.documentElement.style.setProperty('--risk',v);document.getElementById('label').textContent=v+'%';}
+    /* ---- INIT ---- */
+    window.addEventListener('load',async()=>{updateDateInfo();await loadQuotes();const r=computeRiskForToday();setRisk(Math.max(0,r-10));setTimeout(()=>setRisk(r),200);document.getElementById('quoteBtn').addEventListener('click',showRandomQuote);});
+  </script>
 </body>
 </html>
