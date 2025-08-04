@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,47 +9,219 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root { --risk: 50; --needle-angle: calc(-110deg + (var(--risk) * 2.2deg)); }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:"Poppins",sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:2rem 1rem 4rem;background:linear-gradient(135deg,#141e30,#243b55);color:#fff}
-    h1{font-size:2rem;margin-bottom:2rem;text-align:center;letter-spacing:.5px}
-    .gauge{position:relative;width:min(90vw,400px);aspect-ratio:1/0.5;margin-bottom:2rem}
-    .gauge svg{width:100%;height:100%}
-    .needle{position:absolute;left:50%;bottom:0;width:4px;height:45%;background:#fff;transform-origin:bottom;transform:rotate(var(--needle-angle));transition:transform 1.2s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 8px rgba(255,255,255,.8)}
-    .value-label{font-size:clamp(1.5rem,5vw,2.5rem);font-weight:600;margin-top:1rem;text-shadow:0 2px 4px rgba(0,0,0,.6)}
-    /* Emergency button */
-    .btn-emergency{margin-top:2.5rem;padding:1rem 2.5rem;background:#d90429;border:2px solid #fff;border-radius:50px;color:#fff;font-size:1.1rem;font-weight:700;text-transform:uppercase;cursor:pointer;position:relative;animation:pulse 1.6s infinite;transition:transform .15s}
-    .btn-emergency:active{transform:scale(.96)}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,4,41,.7)}70%{box-shadow:0 0 0 18px rgba(217,4,41,0)}100%{box-shadow:0 0 0 0 rgba(217,4,41,0)}}
-    /* Quote */
-    .quote{max-width:700px;margin-top:2rem;font-size:1.25rem;text-align:center;line-height:1.45;padding:0 1rem;opacity:0;transition:opacity .4s}
-    .quote.show{opacity:1}
-    /* Date */
-    .date-box{text-align:center;margin-top:1.5rem;font-size:1.15rem;line-height:1.4}
-    /* Modal */
-    .modal{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);visibility:hidden;opacity:0;transition:opacity .25s}
-    .modal.show{visibility:visible;opacity:1}
-    .modal-content{background:#222;border-radius:20px;padding:1.5rem 1.25rem;width:90%;max-width:320px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.4)}
-    .modal-content p{margin-bottom:1.25rem;font-size:1.05rem}
-    .modal-actions{display:flex;gap:0.75rem;justify-content:center}
-    .modal-actions button{flex:1;padding:0.6rem 0;border:none;border-radius:30px;font-weight:600;font-size:1rem;cursor:pointer}
-    .btn-confirm{background:#2ecc71;color:#fff}
-    .btn-cancel{background:#e63946;color:#fff}
-    @media(prefers-color-scheme:light){body{background:linear-gradient(135deg,#fdfbfe,#e9e9e9);color:#222}.needle{background:#222}.btn-emergency{border-color:#222}.modal-content{background:#fff;color:#222}}
+    :root {
+      --risk: 50;
+      --needle-angle: calc(-110deg + (var(--risk) * 2.2deg));
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      color: #fff
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      letter-spacing: .5px
+    }
+
+    .gauge {
+      position: relative;
+      width: min(90vw, 400px);
+      aspect-ratio: 1/0.5;
+      margin-bottom: 2rem
+    }
+
+    .gauge svg {
+      width: 100%;
+      height: 100%
+    }
+
+    .needle {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 4px;
+      height: 45%;
+      background: #fff;
+      transform-origin: bottom;
+      transform: rotate(var(--needle-angle));
+      transition: transform 1.2s cubic-bezier(.22, .61, .36, 1);
+      box-shadow: 0 0 8px rgba(255, 255, 255, .8)
+    }
+
+    .value-label {
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      font-weight: 600;
+      margin-top: 1rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, .6)
+    }
+
+    .btn-emergency {
+      margin-top: 2.5rem;
+      padding: 1rem 2.5rem;
+      background: #d90429;
+      border: 2px solid #fff;
+      border-radius: 50px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      animation: pulse 1.6s infinite;
+      transition: transform .15s
+    }
+
+    .btn-emergency:active {
+      transform: scale(.96)
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(217, 4, 41, .7)
+      }
+
+      70% {
+        box-shadow: 0 0 0 18px rgba(217, 4, 41, 0)
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(217, 4, 41, 0)
+      }
+    }
+
+    .quote {
+      max-width: 700px;
+      margin-top: 2rem;
+      font-size: 1.25rem;
+      text-align: center;
+      line-height: 1.45;
+      padding: 0 1rem;
+      opacity: 0;
+      transition: opacity .4s
+    }
+
+    .quote.show {
+      opacity: 1
+    }
+
+    .date-box {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 1.15rem;
+      line-height: 1.4
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .6);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity .25s
+    }
+
+    .modal.show {
+      visibility: visible;
+      opacity: 1
+    }
+
+    .modal-content {
+      background: #222;
+      border-radius: 20px;
+      padding: 1.5rem 1.25rem;
+      width: 90%;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .4)
+    }
+
+    .modal-content p {
+      margin-bottom: 1.25rem;
+      font-size: 1.05rem
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 0.6rem 0;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer
+    }
+
+    .btn-confirm {
+      background: #2ecc71;
+      color: #fff
+    }
+
+    .btn-cancel {
+      background: #e63946;
+      color: #fff
+    }
+
+    @media(prefers-color-scheme:light) {
+      body {
+        background: linear-gradient(135deg, #fdfbfe, #e9e9e9);
+        color: #222
+      }
+
+      .needle {
+        background: #222
+      }
+
+      .btn-emergency {
+        border-color: #222
+      }
+
+      .modal-content {
+        background: #fff;
+        color: #222
+      }
+    }
   </style>
 </head>
+
 <body>
   <h1>Esaurometro 2025</h1>
   <div class="gauge" id="gauge">
     <svg viewBox="0 0 100 50">
       <defs>
+        <!-- Gradiente aggiornato: giallo → arancione → rosso scuro -->
         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#2ecc71"/>
-          <stop offset="50%" stop-color="#f1c40f"/>
-          <stop offset="100%" stop-color="#e74c3c"/>
+          <stop offset="0%" stop-color="#FFD700" />
+          <stop offset="50%" stop-color="#FF8C00" />
+          <stop offset="100%" stop-color="#8B0000" />
         </linearGradient>
       </defs>
-      <path d="M10 50 A40 40 0 0 1 90 50" stroke="url(#grad)" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M10 50 A40 40 0 0 1 90 50" stroke="url(#grad)" stroke-width="10" fill="none" stroke-linecap="round" />
     </svg>
     <div class="needle" id="needle"></div>
   </div>
@@ -56,7 +229,6 @@
   <div class="date-box" id="dateBox"><span id="dateText"></span><br><span id="countdown"></span></div>
   <button class="btn-emergency" id="quoteBtn">Calma istantanea</button>
   <div class="quote" id="quote"></div>
-  <!-- Modal -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
       <p>Sei una persona che si offende facilmente?</p>
@@ -67,33 +239,50 @@
     </div>
   </div>
   <script>
-    /* ---- QUOTES ---- */
-    let positiveQuotes=[], altQuotes=[];
-    async function loadJSON(path){try{const r=await fetch(path);if(r.ok)return r.json();}catch(e){console.warn('Impossibile caricare',path);return [];}return []}
-    async function loadAllQuotes(){[positiveQuotes,altQuotes]=await Promise.all([loadJSON('./quotes.json'), loadJSON('./qx.json')]);}
-    function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
-    function showQuote(list){const box=document.getElementById('quote');if(!list.length){box.textContent='⚠️ Nessuna frase disponibile.';}else{const q=pickRandom(list);const t=typeof q==='string'?q:(q.text||JSON.stringify(q));box.textContent='“'+t+'”';}box.classList.add('show');}
+    let positiveQuotes = [], altQuotes = [];
+    async function loadJSON(path) { try { const r = await fetch(path); if (r.ok) return r.json(); } catch (e) { console.warn('Impossibile caricare', path); return []; } return [] }
+    async function loadAllQuotes() { [positiveQuotes, altQuotes] = await Promise.all([loadJSON('./quotes.json'), loadJSON('./qx.json')]); }
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function showQuote(list) { const box = document.getElementById('quote'); if (!list.length) { box.textContent = '⚠️ Nessuna frase disponibile.'; } else { const q = pickRandom(list); const t = typeof q === 'string' ? q : (q.text || JSON.stringify(q)); box.textContent = '“' + t + '”'; } box.classList.add('show'); }
 
-    /* ---- DATE & COUNTDOWN ---- */
-    function updateDateInfo(){const now=new Date();const opts={weekday:'long',day:'numeric',month:'long',year:'numeric'};const dateEl=document.getElementById('dateText');dateEl.textContent=now.toLocaleDateString('it-IT',opts);const target=new Date(now.getFullYear(),9,1);if(now>target)target.setFullYear(now.getFullYear()+1);const diff=Math.ceil((target-now)/86400000);document.getElementById('countdown').textContent=diff+(diff===1?' giorno rimanente':' giorni rimanenti');setDateColor(now,dateEl);}    function setDateColor(now,el){const weekend=now.getDay()===0||now.getDay()===6;const boost=[8,9,10,12,14,15,16].includes(now.getDate())&&now.getMonth()===7;if(weekend||boost){el.style.color='#8B4513';}else if(now.getDay()===1||now.getDay()===2){el.style.color='#e63946';}else{el.style.color='';}}
+    function updateDateInfo() { const now = new Date(); const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }; const dateEl = document.getElementById('dateText'); dateEl.textContent = now.toLocaleDateString('it-IT', opts); const target = new Date(now.getFullYear(), 9, 1); if (now > target) target.setFullYear(now.getFullYear() + 1); const diff = Math.ceil((target - now) / 86400000); document.getElementById('countdown').textContent = diff + (diff === 1 ? ' giorno rimanente' : ' giorni rimanenti'); setDateColor(now, dateEl); }
+    function setDateColor(now, el) { const weekend = now.getDay() === 0 || now.getDay() === 6; const boost = [8, 9, 10, 12, 14, 15, 16].includes(now.getDate()) && now.getMonth() === 7; if (weekend || boost) { el.style.color = '#8B4513'; } else if (now.getDay() === 1 || now.getDay() === 2) { el.style.color = '#e63946'; } else { el.style.color = ''; } }
 
-    /* ---- RISK GAUGE ---- */
-    function computeRiskForToday(){const today=new Date();const utc=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),today.getUTCDate()));let r=30+Math.random()*50;if(utc.getUTCDay()===0||utc.getUTCDay()===6)r+=5;const special=[8,9,10,12,14,15,16];if(utc.getUTCMonth()===7&&special.includes(utc.getUTCDate()))r+=15;return Math.round(Math.min(100,r));}
-    function setRisk(v){v=Math.max(0,Math.min(100,Number(v)||0));document.documentElement.style.setProperty('--risk',v);document.getElementById('label').textContent=v+'%';}
+    // Nuova logica incrementale
+    function computeRiskForToday() {
+      const today = new Date();
+      const startDate = new Date(2025, 7, 4); // 4 agosto 2025
+      const daysSinceStart = Math.max(0, Math.floor((today - startDate) / 86400000));
 
-    /* ---- MODAL ---- */
-    function openModal(){document.getElementById('confirmModal').classList.add('show');}
-    function closeModal(){document.getElementById('confirmModal').classList.remove('show');}
+      let risk = 50 + daysSinceStart * 2.5;
 
-    /* ---- INIT ---- */
-    window.addEventListener('load',async()=>{
+      if (today.getDay() === 0 || today.getDay() === 6) {
+        risk += 5;
+      }
+
+      const specialDays = [8, 9, 10, 12, 14, 15, 16];
+      if (today.getMonth() === 7 && specialDays.includes(today.getDate())) {
+        risk += 15;
+      }
+
+      return Math.round(Math.min(100, risk));
+    }
+
+    function setRisk(v) { v = Math.max(0, Math.min(100, Number(v) || 0)); document.documentElement.style.setProperty('--risk', v); document.getElementById('label').textContent = v + '%'; }
+
+    function openModal() { document.getElementById('confirmModal').classList.add('show'); }
+    function closeModal() { document.getElementById('confirmModal').classList.remove('show'); }
+
+    window.addEventListener('load', async () => {
       updateDateInfo();
       await loadAllQuotes();
-      const r=computeRiskForToday();setRisk(Math.max(0,r-10));setTimeout(()=>setRisk(r),200);
-      document.getElementById('quoteBtn').addEventListener('click',openModal);
-      document.getElementById('modalYes').addEventListener('click',()=>{closeModal();showQuote(positiveQuotes);});
-      document.getElementById('modalNo').addEventListener('click',()=>{closeModal();showQuote(altQuotes);});
+      const r = computeRiskForToday();
+      setRisk(r);
+      document.getElementById('quoteBtn').addEventListener('click', openModal);
+      document.getElementById('modalYes').addEventListener('click', () => { closeModal(); showQuote(positiveQuotes); });
+      document.getElementById('modalNo').addEventListener('click', () => { closeModal(); showQuote(altQuotes); });
     });
   </script>
 </body>
+
 </html>
