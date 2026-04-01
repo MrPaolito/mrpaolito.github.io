@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comunicazione Ufficiale - Dimissioni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --container-bg: #fff;
+            --border-color: #ddd;
+            --primary: #c0392b;
+            --secondary: #2980b9;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a2e;
+                --text-color: #e0e0e0;
+                --container-bg: #16213e;
+                --border-color: #0f3460;
+                --primary: #e74c3c;
+                --secondary: #3498db;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            flex-direction: column;
+            transition: background-color 0.5s ease;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+
+        .content .sign {
+            margin-top: 3rem;
+            font-weight: 600;
+            font-style: italic;
+            text-align: right;
+        }
+
+        .actions {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            position: relative;
+            height: 50px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+            .actions {
+                flex-direction: column-reverse;
+                align-items: center;
+                height: auto;
+            }
+            #btn-accept {
+                position: relative !important;
+                width: 100%;
+                margin-bottom: 1rem;
+                left: auto !important;
+                top: auto !important;
+            }
+            #btn-refuse {
+                width: 100%;
+            }
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #btn-accept {
+            background-color: var(--primary);
+            color: white;
+            position: absolute;
+            right: 0;
+            transition: left 0.2s ease, top 0.2s ease, background-color 0.2s ease;
+        }
+
+        #btn-refuse {
+            background-color: var(--secondary);
+            color: white;
+            transition: background-color 0.2s ease;
+        }
+
+        #btn-refuse:hover {
+            background-color: #1abc9c;
+        }
+
+        /* Modal / Joke overlay */
+        .joke-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(45deg, #ff007f, #7f00ff, #00d2ff);
+            background-size: 400% 400%;
+            animation: gradientBG 5s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            overflow: hidden;
+        }
+
+        .joke-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .joke-text {
+            color: white;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            text-align: center;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: scale(0.5);
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 1rem;
+        }
+
+        .joke-overlay.active .joke-text {
+            transform: scale(1);
+            animation: pulse-bounce 2s infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulse-bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            top: -20px;
+            background-color: #fff;
+            opacity: 0;
+            z-index: 101;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 1;
+            }
+        }
+
+        .fish {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: swim 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes swim {
+            0% { transform: translateX(-30px) translateY(10px) rotate(-10deg); }
+            100% { transform: translateX(30px) translateY(-10px) rotate(10deg); }
+        }
+
+        .sub-text {
+            color: white;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            margin-top: 1rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0 1rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-back {
+            margin-top: 3rem;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.6);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 102;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+            transform: scale(1.05);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="letter">
+        <div class="header">
+            <h1>Comunicazione Ufficiale</h1>
+        </div>
+        <div class="content">
+            <p>Gentile Silvana,</p>
+            <p>Con la presente desidero comunicare formalmente la mia decisione di rassegnare le dimissioni dal mio attuale incarico, con effetto immediato.</p>
+            <p>È stata una decisione attentamente ponderata. Ho deciso di dedicare il prossimo capitolo della mia vita ad inseguire Taylor Swift e alla degustazione professionale di lievitati.</p>
+            <p>Ti prego di cliccare sul pulsante qui sotto per accettare formalmente le mie dimissioni e avviare immediatamente le pratiche di disdetta.</p>
+            
+            <p class="sign">In fede,<br>La vostra pastry preferita</p>
+        </div>
+        
+        <div class="actions">
+            <button id="btn-refuse">Non accetto!</button>
+            <button id="btn-accept">Accetta Dimissioni</button>
+        </div>
+    </div>
+
+    <div class="joke-overlay" id="joke">
+        <div class="fish">🐟</div>
+        <div class="joke-text">PESCE D'APRILE!</div>
+        <div class="sub-text">Scherzavo! Non vi libererete di me così facilmente! </div>
+        <button class="btn-back" onclick="location.reload()">Torna a lavorare</button>
+    </div>
+
+    <script>
+        const btnAccept = document.getElementById('btn-accept');
+        const btnRefuse = document.getElementById('btn-refuse');
+        const jokeOverlay = document.getElementById('joke');
+        const letter = document.getElementById('letter');
+        
+        let isActivated = false;
+
+        const moveButton = (e) => {
+            if (isActivated) return;
+            
+            // Su mobile disabilitiamo lo spostamento per permettere di cliccare e vedere il pesce d'aprile
+            if (window.innerWidth <= 480) {
+                return;
+            }
+
+            if (btnAccept.style.position !== 'fixed') {
+                btnAccept.style.position = 'fixed';
+                btnAccept.style.zIndex = '9999';
+            }
+
+            const btnWidth = btnAccept.offsetWidth;
+            const btnHeight = btnAccept.offsetHeight;
+
+            const maxX = window.innerWidth - btnWidth - 40;
+            const maxY = window.innerHeight - btnHeight - 40;
+
+            const randomX = Math.max(20, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(20, Math.floor(Math.random() * maxY));
+
+            btnAccept.style.left = randomX + 'px';
+            btnAccept.style.top = randomY + 'px';
+            btnAccept.style.right = 'auto'; 
+            btnAccept.style.bottom = 'auto'; 
+        };
+
+        btnAccept.addEventListener('mouseenter', moveButton);
+
+        // Se riescono a cliccare o sono da mobile
+        btnAccept.addEventListener('click', () => {
+             triggerJoke();
+        });
+
+        btnRefuse.addEventListener('click', () => {
+            triggerJoke();
+        });
+
+        function triggerJoke() {
+            if (isActivated) return;
+            isActivated = true;
+            
+            letter.style.transform = 'scale(0.8) translateY(-50px)';
+            letter.style.opacity = '0';
+            
+            setTimeout(() => {
+                jokeOverlay.classList.add('active');
+                createConfetti();
+            }, 400);
+        }
+
+        function createConfetti() {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ffffff'];
+            
+            for (let i = 0; i < 150; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Variabile per dare un po' di forma diversa
+                if (Math.random() > 0.5) {
+                    confetti.style.borderRadius = '50%';
+                }
+                
+                const animDuration = Math.random() * 3 + 2;
+                const animDelay = Math.random() * 3;
+                
+                confetti.style.animation = `fall ${animDuration}s linear forwards`;
+                confetti.style.animationDelay = `${animDelay}s`;
+                
+                jokeOverlay.appendChild(confetti);
+            }
+        }
+    </script>
+</body>
+</html>
